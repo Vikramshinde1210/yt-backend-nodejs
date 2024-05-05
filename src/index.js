@@ -4,13 +4,13 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import { DB_NAME } from './constant.js';
 import connectDB from './db/db.js';
+import { app } from './app.js';
 
 dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGODB_URI;
 
-const app = express();
 
 /*
 // always use try/catch and async/await when connecting to the db
@@ -37,8 +37,10 @@ const app = express();
 
 */
 
-connectDB()
-
-app.listen(PORT, () => {
-    console.log(`Server started listening on port ${PORT}`);
-});
+connectDB().then(() => {
+    app.listen(PORT, () => {
+        console.log(`Server started listening on port ${PORT}`);
+    });
+}).catch((err) => {
+    console.log("MongoDB connection Failed",err)
+}) 
