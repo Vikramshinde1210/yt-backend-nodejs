@@ -24,4 +24,13 @@ app.use(express.urlencoded({
 
 app.use(express.static("public")) // to serve static assets
 
+// routes import
+
+import userRouter from './routes/user.route.js'
+
+// routes declaration
+app.use("/api/v1/users/",userRouter)
+
+
+
 export { app }
