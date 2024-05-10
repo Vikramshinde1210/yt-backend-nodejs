@@ -31,6 +31,13 @@ import userRouter from './routes/user.route.js'
 // routes declaration
 app.use("/api/v1/users/",userRouter)
 
+// Error middleware to handle erros thrown using next()
+app.use((err, req, res, next) => {
+    // Log the error (you can customize this part)
+    console.error(err.stack);
+    // Respond with an appropriate error message
+    res.status(err.statusCode || 500).json({ success: false, message: err.message || 'Error From Server' });
+});
 
 
 export { app }
