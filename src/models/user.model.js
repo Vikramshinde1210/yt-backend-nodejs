@@ -52,7 +52,7 @@ const userSchema =new mongoose.Schema({
 
 userSchema.pre("save", async function (next) { // hooks
     if(!this.isModified("password")) next() // check if password field is changed or not if not return from here
-    this.password = bcrypt.hash(this.password, 10)
+    this.password = await bcrypt.hash(this.password, 10)
     next();
 } )
 
