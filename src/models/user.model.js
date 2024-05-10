@@ -61,6 +61,8 @@ userSchema.methods.isPasswordCorrect = async function( password ) { // custom me
 }
 
 // jwt token is bearer token - means anyone who has token can get access to the resources
+// access token - short lived
+// refresh token - long lived
 
 userSchema.methods.generateAccessToken = function () {
     return jwt.sign(
