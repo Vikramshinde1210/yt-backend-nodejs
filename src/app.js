@@ -27,9 +27,11 @@ app.use(express.static("public")) // to serve static assets
 // routes import
 
 import userRouter from './routes/user.route.js'
+import healthcheckRouter from './routes/healthcheck.route.js'
 
 // routes declaration
 app.use("/api/v1/users/",userRouter)
+app.use("/api/v1/healthcheck/",healthcheckRouter)
 
 // Error middleware to handle erros thrown using next()
 app.use((err, req, res, next) => {
