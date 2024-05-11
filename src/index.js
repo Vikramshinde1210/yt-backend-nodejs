@@ -1,15 +1,14 @@
-// index.js
+import {} from "./utils/envloader.js"
+
 import express from 'express';
-import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import { DB_NAME } from './constant.js';
 import connectDB from './db/db.js';
 import { app } from './app.js';
 
-dotenv.config();
 
 const PORT = process.env.PORT || 3000;
-const MONGODB_URI = process.env.MONGODB_URI;
+// const MONGODB_URI = process.env.MONGODB_URI;
 
 
 /*
