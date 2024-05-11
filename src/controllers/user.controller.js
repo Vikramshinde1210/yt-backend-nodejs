@@ -81,11 +81,12 @@ const registerUser = asyncHandler( async(req, res) => {
     )
 })
 
-const generateAccessAndRefereshTokens = async(userId) =>{
+const generateAccessAndRefreshTokens = async(userId) =>{
     try {
         const user = await User.findById(userId)
         const accessToken = user.generateAccessToken()
-        const refreshToken = user.generateRefreshToken()
+        const refreshToken = user.genarateRefreshToken()
+        // console.log(user, accessToken, refreshAccessToken)
 
         user.refreshToken = refreshToken  // add property to the user object
         await user.save({ validateBeforeSave: false }) // don't validate anything
@@ -94,6 +95,7 @@ const generateAccessAndRefereshTokens = async(userId) =>{
 
 
     } catch (error) {
+        console.log(error)
         throw new ApiError(500, "Something went wrong while generating referesh and access token")
     }
 }
@@ -130,7 +132,7 @@ const loginUser = asyncHandler( async(req, res) => {
      throw new ApiError(401, "Invalid user credentials")
     }
 
-    const {accessToken, refreshToken} = await generateAccessAndRefereshTokens(user._id)
+    const {accessToken, refreshToken} = await generateAccessAndRefreshTokens(user._id)
 
     const loggedInUser = await User.findById(user._id).select("-password -refreshToken") // can skip this db call, depends on the requirements
     
@@ -212,7 +214,7 @@ const refreshAccessToken = asyncHandler(async(req, res) => {
             secure: true
         }
 
-        const { accessToken, refreshToken: newRefreshToken } = await generateAccessAndRefereshTokens(user._id)
+        const { accessToken, refreshToken: newRefreshToken } = await generateAccessAndRefreshTokens(user._id)
 
         return res
         .status(200)
@@ -407,14 +409,16 @@ const getUserChannelProfile = asyncHandler(async(req, res) => {
 })
 
 // in case of aggregation pipeline we will have to explicitely convert id from string to ObjectId
-const getWatchHistory = asyncHandler( async(req, res) => {
+const getWatchHistory = asyncHandler(async(req, res) => {
     const user = await User.aggregate([
         {
-            $match : {
-                _id : mongoose.Schema.Types.ObjectId(req.user._id)
-            },
-            $lookup : {
-                from: "video",
+            $match: {
+                _id: new mongoose.Types.ObjectId(req.user._id)
+            }
+        },
+        {
+            $lookup: {
+                from: "videos",
                 localField: "watchHistory",
                 foreignField: "_id",
                 as: "watchHistory",
@@ -448,9 +452,18 @@ const getWatchHistory = asyncHandler( async(req, res) => {
         }
     ])
 
+    if (!user?.watchHistory?.length) {
+        throw new ApiError(404, "No watch history found")
+    }
+
     return res
     .status(200)
-    .json(new ApiResponse(200, user[0].watchHistory, "Watch history fetched successfully")
+    .json(
+        new ApiResponse(
+            200,
+            user[0].watchHistory,
+            "Watch history fetched successfully"
+        )
     )
 })
 
