@@ -26,4 +26,25 @@ const uploadOnCloudinary = async (localFilePath) => {
     }
 }
 
-export {uploadOnCloudinary}
+const deleteFromCloudinary = async(fileURL) => {
+    try {
+        if(!fileURL) return null;
+
+        // extract public id from image url
+        // "http://res.cloudinary.com/dafcp52od/image/upload/v1715401400/zfg4hdlx5uiagvxgtfqf.png"  -- zfg4hdlx5uiagvxgtfqf
+        const publicId = fileURL.split("/").pop().split(".")[0]
+
+        const reponse = await cloudinary.uploader.destroy(
+            publicId,
+            {resource_type: "auto"}
+        )
+
+        // console.log("response:", reponse)
+        return reponse;
+    } catch (error) {
+        console.log(error)
+        return null
+    }
+}
+
+export {uploadOnCloudinary, deleteFromCloudinary}

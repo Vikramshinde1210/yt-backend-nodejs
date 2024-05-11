@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import {ApiError} from "../utils/apiError.js"
 import { User} from "../models/user.model.js"
-import {uploadOnCloudinary} from "../utils/cloudinary.js"
+import {deleteFromCloudinary, uploadOnCloudinary} from "../utils/cloudinary.js"
 import {ApiResponse} from "../utils/apiResponse.js"
 import jwt from "jsonwebtoken"
 import mongoose from "mongoose";
@@ -293,6 +293,7 @@ const updateUserAvatar = asyncHandler(async(req, res) => {
     }
 
     // TODO: delete old image once new one is uploaded successfully
+    const oldAvatarDeleted = await deleteFromCloudinary(req.user.avatar)
 
     const user = await User.findByIdAndUpdate(
         req.user?._id,
@@ -306,7 +307,7 @@ const updateUserAvatar = asyncHandler(async(req, res) => {
 
     return res
     .status(200)
-    .json(new ApiResponse(200, user, "Avatar image updated successfully"))
+    .json(new ApiResponse(200,{user, "oldAvatarDeleted":oldAvatarDeleted }, "Avatar image updated successfully"))
 })
 
 const updateUserCoverImage = asyncHandler(async(req, res) => {
@@ -320,8 +321,9 @@ const updateUserCoverImage = asyncHandler(async(req, res) => {
 
     if (!coverImage.url) {
         throw new ApiError(400, "Error while uploading on avatar")
-
     }
+
+    const oldCoverImaageDeleted = await deleteFromCloudinary(req.user.coverImage)
 
     const user = await User.findByIdAndUpdate(
         req.user?._id,  // we get string mongoose will convert it into ObjectId
@@ -335,7 +337,7 @@ const updateUserCoverImage = asyncHandler(async(req, res) => {
 
     return res
     .status(200)
-    .json(new ApiResponse(200, user, "Cover image updated successfully"))
+    .json(new ApiResponse(200, {user, "oldCoverImaageDeleted":oldCoverImaageDeleted }, "Cover image updated successfully"))
 })
 
 const getUserChannelProfile = asyncHandler(async(req, res) => {
