@@ -15,6 +15,6 @@ This repository represents my implementation of a comprehensive backend project 
 ## Project Links
 
 - **Model Link:** [Explore the Model](https://app.eraser.io/workspace/YtPqZ1VogxGy1jzIDkzj?origin=share)
-- **Video Playlist:** [Watch the Playlist](https://www.youtube.com/watch?v=EH3vGeqeIAo&list=PLu71SKxNbfoBGh_8p_NS-ZAh6v7HhYqHW)
+- **Frontend screens:** [Explore Frontend Screens](https://app.eraser.io/workspace/YtPqZ1VogxGy1jzIDkzj)
 
 
