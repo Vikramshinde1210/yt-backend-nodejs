@@ -42,7 +42,7 @@ const addComment = asyncHandler(async (req, res) => {
     const comment = Comment.create({
         content,
         video: videoId,
-        owner: req?.user?._id
+        owner: req.user?._id
     })
 
     if(!comment) throw new ApiError(400, "Unable to add comment something went wrong");
@@ -74,7 +74,10 @@ const deleteComment = asyncHandler(async (req, res) => {
     const { commentId } = req.params
     if(isValidObjectId(commentId)) throw new ApiError(400, "Invalid comment id");
 
-    const result = Comment.findByIdAndDelete(commentId)
+    const result = Comment.findByIdAndDelete({
+        _id: commentId,
+        owner: userId,
+    })
 
     if (!result) {
       throw new ApiError(400, "Cannot delete others' comment or comment not found");
