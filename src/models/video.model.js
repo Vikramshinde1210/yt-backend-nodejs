@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2'
-import { Comment } from "./comment.model";
-import { Playlist } from "./playlist.model";
-import { Like } from "./like.model";
+import { Comment } from "./comment.model.js";
+import { Playlist } from "./playlist.model.js";
+import { Like } from "./like.model.js";
 
 const videoSchema = new mongoose.Schema({
     videoFile : {
