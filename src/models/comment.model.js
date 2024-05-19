@@ -20,4 +20,23 @@ const commentSchema = new Schema(
 
 commentSchema.plugin(mongooseAggregatePaginate)
 
+commentSchema.post('findOneAndDelete', { document: true, query: false }, async function(doc, next) {
+    const commentId = doc._id;
+
+    // Remove the comment reference from likes
+    await Like.findByIdAndUpdate(
+        {comment: commentId},
+        {
+            $unset: {
+                comment: 1 // this removes the field from document
+            }
+        },
+        {
+            new: true
+        }
+    )
+
+    next();
+});
+
 export const Comment = mongoose.model("Comment", commentSchema)
