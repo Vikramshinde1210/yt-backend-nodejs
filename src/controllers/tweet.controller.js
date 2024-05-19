@@ -24,7 +24,7 @@ const createTweet = asyncHandler(async (req, res) => {
 
 const getUserTweets = asyncHandler(async (req, res) => {
     const { userId } = req.params
-    if(isValidObjectId(userId)) throw new ApiError(400, "Invalid user id");
+    if(!isValidObjectId(userId)) throw new ApiError(400, "Invalid user id");
 
     const userTweets = await Tweet.findById({owner: userId})
 
@@ -39,7 +39,7 @@ const getUserTweets = asyncHandler(async (req, res) => {
 const updateTweet = asyncHandler(async (req, res) => {
     const { tweetId } = req.params;
     const { content } = req.body;
-    if(isValidObjectId(tweetId)) throw new ApiError(400, "Invalid tweet id");
+    if(!isValidObjectId(tweetId)) throw new ApiError(400, "Invalid tweet id");
 
     const result = Tweet.findByIdAndUpdate(
         { _id: tweetId, owner: user },
@@ -56,7 +56,7 @@ const updateTweet = asyncHandler(async (req, res) => {
 
 const deleteTweet = asyncHandler(async (req, res) => {
     const { tweetId } = req.params
-    if(isValidObjectId(tweetId)) throw new ApiError(400, "Invalid tweet id");
+    if(!isValidObjectId(tweetId)) throw new ApiError(400, "Invalid tweet id");
 
     const result = Tweet.findByIdAndDelete({
         _id: tweetId,

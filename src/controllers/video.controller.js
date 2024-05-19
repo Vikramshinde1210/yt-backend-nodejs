@@ -4,7 +4,7 @@ import {User} from "../models/user.model.js"
 import {ApiError} from "../utils/apiError.js"
 import {ApiResponse} from "../utils/apiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
-import {uploadOnCloudinary} from "../utils/cloudinary.js"
+import {deleteFromCloudinary, uploadOnCloudinary} from "../utils/cloudinary.js"
 
 // https://devuiv2.vercel.app/templates/youtube
 // list view and card view
@@ -43,8 +43,10 @@ const getAllVideos = asyncHandler(async (req, res) => {
 const publishAVideo = asyncHandler(async (req, res) => {
     const { title, description} = req.body
 
-    const videoLocalPath = req.files?.video?.[0]?.path;
+    const videoLocalPath = req.files?.videoFile?.[0]?.path;
     const thumbnailLocalPath = req.files?.thumbnail?.[0]?.path;
+
+    console.table([title, description, videoLocalPath, thumbnailLocalPath])
 
     if ([title, description, videoLocalPath, thumbnailLocalPath].some((field) => field?.trim() === "")) {
         throw new ApiError(400, "All fields are required")
@@ -57,16 +59,17 @@ const publishAVideo = asyncHandler(async (req, res) => {
         throw new ApiError(400, "video/thumbnail file is required")
     }
 
-    const video = Video.create({
+    const video = await Video.create({
         videoFile: videoFile.secure_url,
         thumbnail: thumbnailFile.secure_url,
         title,
         description,
         duration: (videoFile.duration / 60).toFixed(2),
-        owner: userId,
+        owner: req.user?._id,
         isPublished: true,
          views: 0  // initialize views count to zero while publishing video, can increment later
     })
+
 
     res
     .status(201)
@@ -77,14 +80,14 @@ const publishAVideo = asyncHandler(async (req, res) => {
 const getVideoById = asyncHandler(async (req, res) => {
     const { videoId } = req.params
     
-    const video = Video.findById(videoId)
+    const video = await Video.findById(videoId)
 
     if (!video) {
         throw new ApiError(400, "Could not find video");
     }
     return res
     .status(200)
-    .json(new ApiResponse(200, result, "Video fetched successfully"));
+    .json(new ApiResponse(200, video, "Video fetched successfully"));
 })
 
 const updateVideo = asyncHandler(async (req, res) => {
@@ -94,7 +97,7 @@ const updateVideo = asyncHandler(async (req, res) => {
 
     const { title, description} = req.body
 
-    const videoLocalPath = req.files?.video?.[0]?.path;
+    const videoLocalPath = req.files?.videoFile?.[0]?.path;
     const thumbnailLocalPath = req.files?.thumbnail?.[0]?.path;
 
     if ([title, description, videoLocalPath, thumbnailLocalPath].some((field) => field?.trim() === "")) {
@@ -111,7 +114,7 @@ const updateVideo = asyncHandler(async (req, res) => {
     const oldVideoDeleted = await deleteFromCloudinary(video.videoFile)
     const oldthumbnailDeleted = await deleteFromCloudinary(video.thumbnail)
 
-    const updatedVideo = Video.findByIdAndUpdate(
+    const updatedVideo = await Video.findByIdAndUpdate(
         videoId,
         {
             videoFile: videoFile.secure_url,
@@ -137,14 +140,14 @@ const deleteVideo = asyncHandler(async (req, res) => {
     }
 
     // delete thumbail & video from cloudinary
-    const videoToDelete = await deleteVideoOnCloudinary(video?.videoFile);
-    const thumbnailToDelete = await deleteOnCloudinary(video?.thumbnail);
+    const videoToDelete = await deleteFromCloudinary(video?.videoFile, "video");
+    const thumbnailToDelete = await deleteFromCloudinary(video?.thumbnail, "image");
 
     if(!videoToDelete || !thumbnailToDelete){
         throw new ApiError(400, "Failed to delete video/thumbail from cloudinary retry again");
     }
 
-    const result = Video.findByIdAndDelete(videoId);
+    const result = await Video.findByIdAndDelete(videoId);
 
     if(!result){
         throw new ApiError(400, "Failed to delete video/thumbail, retry again");

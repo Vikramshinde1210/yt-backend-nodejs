@@ -8,7 +8,7 @@ const getVideoComments = asyncHandler(async (req, res) => {
     const {videoId} = req.params
     const {page = 1, limit = 10} = req.query
 
-    if(isValidObjectId(videoId)) throw new ApiError(400, "Invalid video id");
+    if(!isValidObjectId(videoId)) throw new ApiError(400, "Invalid video id");
 
     const options = {
         page: parseInt(page, 10),
@@ -37,7 +37,7 @@ const addComment = asyncHandler(async (req, res) => {
     const { videoId } = req.params;
 
     if(!content) throw new ApiError(400, "Missing required fields");
-    if(isValidObjectId(videoId)) throw new ApiError(400, "Invalid video id");
+    if(!isValidObjectId(videoId)) throw new ApiError(400, "Invalid video id");
 
     const comment = Comment.create({
         content,
@@ -55,7 +55,7 @@ const addComment = asyncHandler(async (req, res) => {
 const updateComment = asyncHandler(async (req, res) => {
     const { commentId } = req.params
     const { content } = req.body;
-    if(isValidObjectId(commentId)) throw new ApiError(400, "Invalid comment id");
+    if(!isValidObjectId(commentId)) throw new ApiError(400, "Invalid comment id");
 
     const result = Comment.findByIdAndUpdate(
         { _id: commentId, owner: user },
@@ -72,7 +72,7 @@ const updateComment = asyncHandler(async (req, res) => {
 
 const deleteComment = asyncHandler(async (req, res) => {
     const { commentId } = req.params
-    if(isValidObjectId(commentId)) throw new ApiError(400, "Invalid comment id");
+    if(!isValidObjectId(commentId)) throw new ApiError(400, "Invalid comment id");
 
     const result = Comment.findByIdAndDelete({
         _id: commentId,
