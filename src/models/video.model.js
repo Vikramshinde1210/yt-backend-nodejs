@@ -41,9 +41,14 @@ const videoSchema = new mongoose.Schema({
 
 videoSchema.plugin(mongooseAggregatePaginate) // add mongodb aggregation library as plugin in video schema
 
-// middleware to delete all the data related to the video
-videoSchema.post('findOneAndDelete', { document: true, query: false }, async function(doc, next) {
+videoSchema.post("findOneAndDelete", async function (doc) { // hooks
+    if (!doc) {
+        console.log('Document not found');
+        return;
+    }
+    
     const videoId = doc._id;
+    // console.log("Inside post middleware, videoId:", videoId);
 
     // Remove the video from playlists
     await Playlist.updateMany(
@@ -55,7 +60,7 @@ videoSchema.post('findOneAndDelete', { document: true, query: false }, async fun
     await Comment.deleteMany({videos: videoId})
 
     // Remove the video reference from likes
-    await Like.findByIdAndUpdate(
+    await Like.updateMany(
         {video: videoId},
         {
             $unset: {
@@ -67,7 +72,7 @@ videoSchema.post('findOneAndDelete', { document: true, query: false }, async fun
         }
     )
 
-    next();
-});
+    // console.log("out of post middleware");
+} )
 
 export const Video = mongoose.model("Video", videoSchema)
