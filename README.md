@@ -15,6 +15,6 @@ This repository represents my implementation of a comprehensive backend project 
 ## Project Links
 
 - **Model Link:** [Explore the Model](https://app.eraser.io/workspace/YtPqZ1VogxGy1jzIDkzj?origin=share)
-- **Frontend screens:** [Explore Frontend Screens](https://app.eraser.io/workspace/YtPqZ1VogxGy1jzIDkzj)
+- **Frontend screens:** [Explore Frontend Screens](https://devuiv2.vercel.app/templates/youtube)
 
 
